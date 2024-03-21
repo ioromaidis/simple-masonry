@@ -1,0 +1,11 @@
+{
+  "name": "@simple-masonry/core",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "lint": "lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+  }
+}

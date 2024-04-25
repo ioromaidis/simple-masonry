@@ -6,7 +6,7 @@ export interface SimpleMasonryOptions {
 }
 
 export interface MasonryItem {
-  image: string;
+  imageSrc: string;
   meta?: any;
 }
 

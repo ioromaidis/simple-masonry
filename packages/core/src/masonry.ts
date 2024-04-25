@@ -19,7 +19,7 @@ let imgHeight: number;
 let spacing: number;
 let items: MasonryItem[];
 
-function loadImage(url) {
+function loadImage(imageSrc: string) {
   return new Promise((resolve, reject) => {
     const newImage = new Image();
     newImage.onload = function () {
@@ -28,7 +28,7 @@ function loadImage(url) {
     newImage.onerror = function () {
       reject('image load error');
     };
-    newImage.src = url;
+    newImage.src = imageSrc;
   });
 }
 
@@ -110,7 +110,7 @@ async function createMasonry(
 ): Promise<EnrichedMasonryItem[] | void> {
   assignOptions(options);
 
-  return Promise.all(options.items.map((item) => loadImage(item.image)))
+  return Promise.all(options.items.map((item) => loadImage(item.imageSrc)))
     .then(createLayout)
     .catch(handleError);
 }

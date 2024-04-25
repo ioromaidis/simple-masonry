@@ -2,7 +2,7 @@ export interface SimpleMasonryOptions {
   container: HTMLElement;
   items: MasonryItem[];
   imgHeight?: number;
-  spacing?: number;
+  gutter?: number;
 }
 
 export interface MasonryItem {

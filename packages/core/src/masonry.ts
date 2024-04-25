@@ -7,7 +7,7 @@ import { handleError } from './utils';
 
 const DEFAULT_OPTIONS: Partial<SimpleMasonryOptions> = {
   imgHeight: 200,
-  spacing: 20,
+  gutter: 20,
 };
 
 type Masonry = {
@@ -16,7 +16,7 @@ type Masonry = {
 
 let containerEl: HTMLElement;
 let imgHeight: number;
-let spacing: number;
+let gutter: number;
 let items: MasonryItem[];
 
 function loadImage(imageSrc: string) {
@@ -53,13 +53,13 @@ function createLayout(images: HTMLImageElement[]): EnrichedMasonryItem[] {
       width,
       height: imgHeight,
       left: rowOffset,
-      top: rowIdx * (containerOffset + imgHeight + spacing),
+      top: rowIdx * (containerOffset + imgHeight + gutter),
       position: 'absolute',
       objectFit: 'cover',
     };
 
     rowTemp.push(css);
-    rowOffset += width + spacing;
+    rowOffset += width + gutter;
   }
 
   function commitRow() {
@@ -73,7 +73,7 @@ function createLayout(images: HTMLImageElement[]): EnrichedMasonryItem[] {
     const adjustedWidth =
       (images[itemIndex].naturalWidth * imgHeight) /
       images[itemIndex].naturalHeight;
-    const spaceLeft = Math.floor(containerWidth - rowOffset + spacing);
+    const spaceLeft = Math.floor(containerWidth - rowOffset + gutter);
     if (spaceLeft < adjustedWidth) {
       rowOffset = 0;
       rowTemp = rowTemp.map((item, i) => {
@@ -84,7 +84,7 @@ function createLayout(images: HTMLImageElement[]): EnrichedMasonryItem[] {
           width: newWidth,
           left: Math.floor(rowOffset),
         };
-        rowOffset += newWidth + spacing;
+        rowOffset += newWidth + gutter;
 
         return updatedItem;
       });
@@ -99,7 +99,7 @@ function createLayout(images: HTMLImageElement[]): EnrichedMasonryItem[] {
     commitRow();
   }
 
-  containerEl.style.height = rowIdx * (imgHeight + spacing) + 'px';
+  containerEl.style.height = rowIdx * (imgHeight + gutter) + 'px';
   containerEl.style.overflow = 'hidden';
 
   return rows.map((css, i) => ({ ...items[i], css }));
@@ -121,7 +121,7 @@ function assignOptions(options: SimpleMasonryOptions) {
   }
 
   imgHeight = options.imgHeight ?? DEFAULT_OPTIONS.imgHeight;
-  spacing = options.spacing ?? DEFAULT_OPTIONS.spacing;
+  gutter = options.gutter ?? DEFAULT_OPTIONS.gutter;
   containerEl = options.container;
   containerEl.style.position = 'relative';
   items = options.items;

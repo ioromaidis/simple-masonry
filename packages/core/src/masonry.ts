@@ -49,7 +49,20 @@ function createLayout(images: HTMLImageElement[]): EnrichedMasonryItem[] {
     placeInRow();
   }
 
-  function commitInRow(width: number) {
+  function placeInRow() {
+    const widthInProportionToSetHeight =
+      (images[itemIndex].naturalWidth * imgHeight) /
+      images[itemIndex].naturalHeight;
+    if (getAvailableSpace() < widthInProportionToSetHeight) {
+      fixTempRow();
+      commitRow();
+    } else {
+      addToTempRow(widthInProportionToSetHeight);
+      itemIndex++;
+    }
+  }
+
+  function addToTempRow(width: number) {
     const css = {
       width,
       height: imgHeight,
@@ -70,30 +83,25 @@ function createLayout(images: HTMLImageElement[]): EnrichedMasonryItem[] {
     rowOffset = 0;
   }
 
-  function placeInRow() {
-    const widthInProportionToSetHeight =
-      (images[itemIndex].naturalWidth * imgHeight) /
-      images[itemIndex].naturalHeight;
-    const spaceLeft = Math.floor(containerWidth - rowOffset + gutter);
-    if (spaceLeft < widthInProportionToSetHeight) {
-      rowOffset = 0;
-      rowTemp = rowTemp.map((item, i) => {
-        const padding = spaceLeft / rowTemp.length;
-        let newWidth = Math.floor(item.width + padding);
-        let updatedItem = {
-          ...item,
-          width: newWidth,
-          left: Math.floor(rowOffset),
-        };
-        rowOffset += newWidth + gutter;
+  function getAvailableSpace() {
+    return Math.floor(containerWidth - rowOffset + gutter);
+  }
 
-        return updatedItem;
-      });
-      commitRow();
-    } else {
-      commitInRow(widthInProportionToSetHeight);
-      itemIndex++;
-    }
+  function fixTempRow() {
+    const spaceLeft = getAvailableSpace();
+    rowOffset = 0;
+    rowTemp = rowTemp.map((item, i) => {
+      const padding = spaceLeft / rowTemp.length;
+      let newWidth = Math.floor(item.width + padding);
+      let updatedItem = {
+        ...item,
+        width: newWidth,
+        left: Math.floor(rowOffset),
+      };
+      rowOffset += newWidth + gutter;
+
+      return updatedItem;
+    });
   }
 
   if (rowTemp.length) {

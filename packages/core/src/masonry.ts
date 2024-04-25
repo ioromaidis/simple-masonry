@@ -19,7 +19,7 @@ let imgHeight: number;
 let gutter: number;
 let items: MasonryItem[];
 
-function loadImage(imageSrc: string) {
+function handleImageLoad(imageSrc: string) {
   return new Promise((resolve, reject) => {
     const newImage = new Image();
     newImage.onload = function () {
@@ -42,13 +42,14 @@ function createLayout(images: HTMLImageElement[]): EnrichedMasonryItem[] {
   let rowOffset = 0;
   let itemIndex = 0;
 
+  // Container needs to be relative in order to container absolute children
+  containerEl.style.position = 'relative';
+
   while (itemIndex < images.length) {
-    console.log({ itemIndex });
     placeInRow();
   }
 
-  function commitInRow(width, itemIndex) {
-    console.log({ width, itemIndex, rowIdx });
+  function commitInRow(width: number) {
     const css = {
       width,
       height: imgHeight,
@@ -70,11 +71,11 @@ function createLayout(images: HTMLImageElement[]): EnrichedMasonryItem[] {
   }
 
   function placeInRow() {
-    const adjustedWidth =
+    const widthInProportionToSetHeight =
       (images[itemIndex].naturalWidth * imgHeight) /
       images[itemIndex].naturalHeight;
     const spaceLeft = Math.floor(containerWidth - rowOffset + gutter);
-    if (spaceLeft < adjustedWidth) {
+    if (spaceLeft < widthInProportionToSetHeight) {
       rowOffset = 0;
       rowTemp = rowTemp.map((item, i) => {
         const padding = spaceLeft / rowTemp.length;
@@ -90,7 +91,7 @@ function createLayout(images: HTMLImageElement[]): EnrichedMasonryItem[] {
       });
       commitRow();
     } else {
-      commitInRow(adjustedWidth, itemIndex);
+      commitInRow(widthInProportionToSetHeight);
       itemIndex++;
     }
   }
@@ -110,7 +111,9 @@ async function createMasonry(
 ): Promise<EnrichedMasonryItem[] | void> {
   assignOptions(options);
 
-  return Promise.all(options.items.map((item) => loadImage(item.imageSrc)))
+  return Promise.all(
+    options.items.map((item) => handleImageLoad(item.imageSrc))
+  )
     .then(createLayout)
     .catch(handleError);
 }
@@ -123,7 +126,6 @@ function assignOptions(options: SimpleMasonryOptions) {
   imgHeight = options.imgHeight ?? DEFAULT_OPTIONS.imgHeight;
   gutter = options.gutter ?? DEFAULT_OPTIONS.gutter;
   containerEl = options.container;
-  containerEl.style.position = 'relative';
   items = options.items;
 }
 
